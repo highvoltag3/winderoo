@@ -65,7 +65,7 @@ app.post('/api/update', (req, res) => {
         if (update.rtcGmtOffset) state.gmtOffset = update.rtcGmtOffset;
         if (update.rtcDST !== undefined) state.dst = update.rtcDST;
         
-        res.json({ success: true });
+        res.status(200).json({ success: true });
     } else {
         res.status(400).json({ error: 'Invalid action' });
     }
