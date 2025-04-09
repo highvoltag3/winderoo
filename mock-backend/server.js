@@ -36,14 +36,14 @@ let state = {
     dst: false
 };
 
-// GET /status
-app.get('/status', (req, res) => {
+// GET /api/status
+app.get('/api/status', (req, res) => {
     state.currentTimeEpoch = Date.now() / 1000;
     res.json(state);
 });
 
-// POST /update
-app.post('/update', (req, res) => {
+// POST /api/update
+app.post('/api/update', (req, res) => {
     const update = req.body;
     
     if (update.action === 'update') {
@@ -71,8 +71,8 @@ app.post('/update', (req, res) => {
     }
 });
 
-// GET /time
-app.get('/time', (req, res) => {
+// GET /api/time
+app.get('/api/time', (req, res) => {
     res.json({
         utc_offset: "+00:00",
         timezone: "UTC",
