@@ -349,7 +349,7 @@ export class SettingsComponent implements OnInit, AfterViewChecked {
       rtcDST: this.upload.dst,
     }
 
-    this.apiService.updateState(body).subscribe((response) => {
+    this.apiService.updateSettings(body).subscribe((response: any) => {
       if (response.status == 204) {
         this.getData();
       }
