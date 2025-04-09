@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { tap } from 'rxjs/operators';
 
 
 export interface Update {
@@ -70,11 +71,35 @@ export interface WorldTimeAPI {
   providedIn: 'root'
 })
 export class ApiService {
+  private statusSubject = new BehaviorSubject<Status | null>(null);
+  status$ = this.statusSubject.asObservable();
+
+  constructor(private http: HttpClient) {
+    this.startPolling();
+  }
+
+  private startPolling() {
+    setInterval(() => {
+      this.getStatus().subscribe();
+    }, 1000);
+  }
+
+  getStatus() {
+    return this.http.get<Status>(`${environment.apiUrl}/api/status`).pipe(
+      tap(status => this.statusSubject.next(status))
+    );
+  }
+
+  updateSettings(update: Update) {
+    return this.http.post(`${environment.apiUrl}/api/update`, update);
+  }
+
+  getTime() {
+    return this.http.get(`${environment.apiUrl}/api/time`);
+  }
 
   isWinderEnabled$ = new BehaviorSubject(0);
   shouldRefresh$ = new BehaviorSubject(false);
-
-  constructor(private http: HttpClient) { }
 
   static constructURL(): string {
     if (
@@ -96,10 +121,6 @@ export class ApiService {
 
   getShouldRefresh() {
     return this.shouldRefresh$.asObservable();
-  }
-
-  getStatus() {
-    return this.http.get<Status>(ApiService.constructURL() + 'status');
   }
 
   updatePowerState(powerState: boolean) {
@@ -127,11 +148,6 @@ export class ApiService {
       + "timerEnabled=" + timerState;
 
     return this.http.post(constructedURL, null, { observe: 'response' });
-  }
-
-  updateState(update: Update) {
-    const baseURL = ApiService.constructURL() + 'update';
-    return this.http.post(baseURL, update, { observe: 'response' });
   }
 
   resetDevice() {

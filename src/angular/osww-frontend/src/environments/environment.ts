@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://winderoo.local',
+  apiUrl: 'http://localhost:3000',
+  useMockBackend: true
 };
 
 /*
