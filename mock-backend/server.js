@@ -46,7 +46,7 @@ app.get('/api/status', (req, res) => {
 app.post('/api/update', (req, res) => {
     const update = req.body;
     
-    if (update.action === 'update') {
+    if (update.action === 'update' || update.action === 'START' || update.action === 'STOP') {
         // Update state based on the request
         if (update.rotationDirection) state.direction = update.rotationDirection;
         if (update.tpd) state.rotationsPerDay = update.tpd.toString();
@@ -64,6 +64,17 @@ app.post('/api/update', (req, res) => {
         }
         if (update.rtcGmtOffset) state.gmtOffset = update.rtcGmtOffset;
         if (update.rtcDST !== undefined) state.dst = update.rtcDST;
+
+        // Handle START/STOP actions
+        if (update.action === 'START') {
+            state.status = 'Winding';
+            state.winderEnabled = 1;
+            state.startTimeEpoch = Date.now() / 1000;
+            state.estimatedRoutineFinishEpoch = (Date.now() / 1000) + 3600; // 1 hour from now
+        } else if (update.action === 'STOP') {
+            state.status = 'Stopped';
+            state.winderEnabled = 0;
+        }
         
         res.status(200).json({ success: true });
     } else {
